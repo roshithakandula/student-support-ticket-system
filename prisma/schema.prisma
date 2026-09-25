@@ -1,0 +1,101 @@
+// Prisma schema — mirrors schema.sql (users, categories, tickets,
+// ticket_activity_history) so the app can run against a real Postgres
+// database (Neon / Vercel Postgres / Supabase all work) instead of the
+// in-memory / localStorage demo store.
+//
+// Author: Roshitha Kandula — Assignment 4: Student Support & Ticket
+// Management System.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  STAFF
+  ADMIN
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role     @default(STUDENT)
+  department   String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  ticketsRaised   Ticket[]         @relation("StudentTickets")
+  ticketsAssigned Ticket[]         @relation("AssignedTickets")
+  activity        TicketActivity[]
+
+  @@map("users")
+}
+
+model Category {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+  description     String?
+  defaultSlaHours Int      @default(48) @map("default_sla_hours")
+  tickets         Ticket[]
+
+  @@map("categories")
+}
+
+model Ticket {
+  id              String    @id @default(uuid())
+  ticketNumber    String    @unique @map("ticket_number")
+  title           String
+  description     String
+  categoryId      Int       @map("category_id")
+  category        Category  @relation(fields: [categoryId], references: [id])
+  priority        Priority  @default(MEDIUM)
+  status          Status    @default(OPEN)
+  studentId       String    @map("student_id")
+  student         User      @relation("StudentTickets", fields: [studentId], references: [id])
+  assignedStaffId String?   @map("assigned_staff_id")
+  assignedStaff   User?     @relation("AssignedTickets", fields: [assignedStaffId], references: [id])
+  slaDueAt        DateTime  @map("sla_due_at")
+  resolvedAt      DateTime? @map("resolved_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  activity TicketActivity[]
+
+  @@map("tickets")
+}
+
+model TicketActivity {
+  id           String   @id @default(uuid())
+  ticketId     String   @map("ticket_id")
+  ticket       Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  actorId      String?  @map("actor_id")
+  actor        User?    @relation(fields: [actorId], references: [id])
+  action       String
+  fieldChanged String?  @map("field_changed")
+  oldValue     String?  @map("old_value")
+  newValue     String?  @map("new_value")
+  notes        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("ticket_activity_history")
+}

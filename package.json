@@ -1,0 +1,38 @@
+{
+  "name": "student-support-ticket-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Assignment 4: Student Support & Ticket Management System — Next.js App Router, TypeScript, Tailwind CSS, NextAuth v5, Prisma.",
+  "author": "Roshitha Kandula",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "next-auth": "5.0.0-beta.25",
+    "@prisma/client": "^5.19.1",
+    "bcryptjs": "^2.4.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "lucide-react": "^0.436.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "@types/node": "^20.14.15",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/bcryptjs": "^2.4.6",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.9",
+    "prisma": "^5.19.1",
+    "tsx": "^4.19.0"
+  }
+}
